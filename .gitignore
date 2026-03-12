@@ -1,0 +1,42 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# HuggingFace / Transformers cache
+.cache/
+huggingface/
+.huggingface/
+*.bin
+*.pt
+
+# Whisper model cache
+~/.cache/whisper/
+
+# Audio test files
+*.wav
+*.mp3
+*.m4a
+
+# Logs
+*.log
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Temporary files
+*.tmp
+*.temp
