@@ -49,11 +49,9 @@ Thumbs.db
 # VS Code
 .vscode/
 
-# PyCharm
-.idea/
+# Temporary files
+*.tmp
+*.temp
 
-# Node modules (if you add frontend tools later)
-node_modules/
-# FFmpeg binaries
-ffmpeg-8.0.1-essentials_build
-ffmpeg-8.0.1-essentials_build/*
+# Firebase key (sensitive information)
+firebase-key.json
