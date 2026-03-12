@@ -1,24 +1,24 @@
 import librosa
 import whisper
 from transformers import pipeline
-import warnings
 import subprocess
+import warnings
+import numpy as np
+import soundfile as sf
+import os
 
 warnings.filterwarnings("ignore")
 
+# Firebase optional
 try:
-     
-except ImportError:
+    from firebase_db import save_call
+except:
     def save_call(*args, **kwargs):
-        print("save_call triggered but firebase_db not found")
+        print("Firebase disabled")
 
+print("Loading AI models...")
 
-# -----------------------------
-# Load Models Once
-# -----------------------------
-
-print("Loading models...")
-
+# Load models once
 speech_model = whisper.load_model("base")
 
 audio_emotion_model = pipeline(
@@ -31,101 +31,119 @@ text_emotion_model = pipeline(
     model="j-hartmann/emotion-english-distilroberta-base"
 )
 
-print("Models loaded.")
+print("Models loaded successfully")
 
-
-# -----------------------------
-# Main Analysis Function
-# -----------------------------
 
 def analyze_audio_file(audio_file_path):
 
     try:
 
-        # -----------------------------
-        # Convert webm to wav
-        # -----------------------------
-        if audio_file_path.endswith(".webm"):
+        # ----------------------------------
+        # Convert webm/ogg → wav
+        # ----------------------------------
+        wav_path = audio_file_path.rsplit(".", 1)[0] + ".wav"
 
-            wav_path = audio_file_path.replace(".webm", ".wav")
+        subprocess.run([
+            "ffmpeg",
+            "-y",
+            "-i", audio_file_path,
+            "-acodec", "pcm_s16le",
+            "-ar", "16000",
+            "-ac", "1",
+            wav_path
+        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-            subprocess.run([
-                "ffmpeg",
-                "-y",
-                "-i",
-                audio_file_path,
-                "-ar", "16000",
-                "-ac", "1",
-                wav_path
-            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        proc_path = wav_path
 
-            proc_path = wav_path
-
-        else:
-            proc_path = audio_file_path
+        print("Converted file:", proc_path)
+        print("File size:", os.path.getsize(proc_path))
 
 
-        # -----------------------------
-        # Whisper Transcription
-        # -----------------------------
-
-        speech_result = speech_model.transcribe(proc_path)
-
-        transcript = speech_result["text"].strip()
-
-        print("Transcript:", transcript)
-
-
-        # -----------------------------
-        # Audio Emotion Detection
-        # -----------------------------
-
+        # ----------------------------------
+        # Load Audio
+        # ----------------------------------
         audio, sr = librosa.load(proc_path, sr=16000)
 
-        audio_result = audio_emotion_model(audio)
+        duration = len(audio) / sr
+        max_amp = np.max(np.abs(audio))
 
-        top_audio_emotion = max(audio_result, key=lambda x: x['score'])
+        print("Audio duration:", duration)
+        print("Max amplitude:", max_amp)
 
-        audio_emotion = top_audio_emotion['label']
 
-        audio_confidence = top_audio_emotion['score'] * 100
+        # ----------------------------------
+        # Silence Detection
+        # ----------------------------------
+        if max_amp < 0.015:
+
+            print("Audio detected as silence")
+
+            transcript = ""
+            audio_emotion = "neu"
+            audio_conf = 100.0
+
+        else:
+
+            # Normalize audio
+            audio = audio / max_amp
+            sf.write(proc_path, audio, sr)
+
+            # ----------------------------------
+            # Whisper Speech Recognition
+            # ----------------------------------
+            speech_result = speech_model.transcribe(
+                proc_path,
+                fp16=False,
+                language="en",
+                condition_on_previous_text=False
+            )
+
+            transcript = speech_result["text"].strip()
+
+            print("Transcript:", transcript)
+
+
+            # ----------------------------------
+            # Audio Emotion Detection
+            # ----------------------------------
+            audio_result = audio_emotion_model(audio)
+
+            top_audio = max(audio_result, key=lambda x: x["score"])
+
+            audio_emotion = top_audio["label"]
+            audio_conf = top_audio["score"] * 100
 
         print("Audio Emotion:", audio_emotion)
-        print("Audio Confidence:", audio_confidence)
+        print("Audio Confidence:", audio_conf)
 
 
-        # -----------------------------
+        # ----------------------------------
         # Text Emotion Detection
-        # -----------------------------
-
+        # ----------------------------------
         if transcript:
 
             text_result = text_emotion_model(transcript)
 
-            text_emotion = text_result[0]['label']
-
-            text_confidence = text_result[0]['score'] * 100
+            text_emotion = text_result[0]["label"]
+            text_conf = text_result[0]["score"] * 100
 
         else:
 
             text_emotion = "neutral"
-
-            text_confidence = 100
-
+            text_conf = 100.0
 
         print("Text Emotion:", text_emotion)
-        print("Text Confidence:", text_confidence)
+        print("Text Confidence:", text_conf)
 
 
-        # -----------------------------
-        # Risk Detection
-        # -----------------------------
-
-        keywords = ["help","attack","emergency","pain","fire","blood"]
+        # ----------------------------------
+        # Risk Detection Logic
+        # ----------------------------------
+        keywords = ["help", "attack", "emergency", "pain", "fire", "blood"]
 
         if any(word in transcript.lower() for word in keywords) \
                 or audio_emotion in ["ang"] \
-                or text_emotion in ["fear","anger"]:
+                or text_emotion in ["fear", "anger"]:
 
             priority = "HIGH"
 
@@ -137,35 +155,25 @@ def analyze_audio_file(audio_file_path):
 
             priority = "LOW"
 
+        print("Priority:", priority)
 
-        print("Priority Level:", priority)
 
-
-        # -----------------------------
+        # ----------------------------------
         # Save to Firebase
-        # -----------------------------
-
+        # ----------------------------------
         save_call(transcript, audio_emotion, text_emotion, priority)
 
 
-        # -----------------------------
-        # Return result to frontend
-        # -----------------------------
-
+        # ----------------------------------
+        # Return JSON to frontend
+        # ----------------------------------
         return {
-
             "transcript": transcript,
-
             "audio_emotion": audio_emotion,
-
-            "audio_confidence": round(audio_confidence,2),
-
+            "audio_confidence": round(audio_conf, 2),
             "text_emotion": text_emotion,
-
-            "text_confidence": round(text_confidence,2),
-
+            "text_confidence": round(text_conf, 2),
             "priority": priority
-
         }
 
 
@@ -173,15 +181,6 @@ def analyze_audio_file(audio_file_path):
 
         print("Error:", e)
 
-        return {"error": str(e)}
-
-
-# -----------------------------
-# Local testing (optional)
-# -----------------------------
-
-if __name__ == "__main__":
-
-    result = analyze_audio_file("live_audio.wav")
-
-    print(result)
+        return {
+            "error": str(e)
+        }
