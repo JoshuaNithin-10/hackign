@@ -11,9 +11,9 @@
   /* Emotion Semantic Colors */
   --color-neutral: #10b981;    /* Calm / Steady */
   --color-stressed: #f59e0b;   /* Warning */
-  --color-abusive: #ef4444;    /* Danger / Hostile */
-  --color-pain: #f43f5e;       /* Critical */
-  --color-drunk: #8b5cf6;      /* Impaired */
+  --color-angry: #ef4444;    /* Danger / Hostile */
+  --color-happy: #0ea5e9;       /* Positive */
+  --color-sad: #8b5cf6;      /* Negative */
 
   --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
   --font-main: 'Inter', sans-serif;
@@ -225,6 +225,22 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: var(--font-main);
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.btn-primary.recording {
+  background: var(--color-angry);
+  animation: pulseRisk 1.5s infinite;
 }
 
 .btn-secondary {
@@ -441,9 +457,9 @@ body {
 }
 
 .bar-stressed { background: var(--color-stressed); box-shadow: 0 0 8px var(--color-stressed); }
-.bar-pain { background: var(--color-pain); box-shadow: 0 0 8px var(--color-pain); }
-.bar-abusive { background: var(--color-abusive); box-shadow: 0 0 8px var(--color-abusive); }
-.bar-drunk { background: var(--color-drunk); box-shadow: 0 0 8px var(--color-drunk); }
+.bar-Happy { background: var(--color-happy); box-shadow: 0 0 8px var(--color-happy); }
+.bar-Sad { background: var(--color-sad); box-shadow: 0 0 8px var(--color-sad); }
+.bar-Angry { background: var(--color-angry); box-shadow: 0 0 8px var(--color-angry); }
 .bar-neutral { background: var(--color-neutral); }
 
 /* Timeline Card */

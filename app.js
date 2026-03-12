@@ -18,16 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Progress Bars & Values
     const bars = {
         stressed: document.getElementById('bar-stressed'),
-        pain: document.getElementById('bar-pain'),
-        abusive: document.getElementById('bar-abusive'),
-        drunk: document.getElementById('bar-drunk'),
+        Happy: document.getElementById('bar-Happy'),
+        Angry: document.getElementById('bar-Angry'),
+        Sad: document.getElementById('bar-Sad'),
         neutral: document.getElementById('bar-neutral')
     };
     const vals = {
         stressed: document.getElementById('val-stressed'),
-        pain: document.getElementById('val-pain'),
-        abusive: document.getElementById('val-abusive'),
-        drunk: document.getElementById('val-drunk'),
+        Happy: document.getElementById('val-Happy'),
+        Angry: document.getElementById('val-Angry'),
+        Sad: document.getElementById('val-Sad'),
         neutral: document.getElementById('val-neutral')
     };
 
@@ -101,9 +101,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let data = {
             neutral: Math.random() * 20 + 80, // mostly neutral
             stressed: Math.random() * 10,
-            pain: Math.random() * 5,
-            abusive: Math.random() * 5,
-            drunk: Math.random() * 5
+            Happy: Math.random() * 5,
+            Angry: Math.random() * 5,
+            Sad: Math.random() * 5
         };
 
         if (isEscalated) {
@@ -111,9 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
             data = {
                 neutral: Math.random() * 10,
                 stressed: Math.random() * 40 + 40,
-                abusive: Math.random() * 60 + 30,
-                pain: Math.random() * 20,
-                drunk: Math.random() * 10
+                Angry: Math.random() * 60 + 30,
+                Happy: Math.random() * 5,
+                Sad: Math.random() * 10
             };
         }
 
@@ -144,9 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const emotionMap = {
             neutral: { title: 'Neutral', text: 'Caller maintaining baseline vocal patterns.', color: 'var(--color-neutral)', risk: 'Normal' },
             stressed: { title: 'Stressed', text: 'Elevated pitch and tempo detected.', color: 'var(--color-stressed)', risk: 'Warning' },
-            abusive: { title: 'Abusive', text: 'Aggressive tone and keywords detected.', color: 'var(--color-abusive)', risk: 'Critical' },
-            pain: { title: 'In Pain', text: 'Vocal distress markers indicating physical pain.', color: 'var(--color-pain)', risk: 'High Risk' },
-            drunk: { title: 'Intoxicated', text: 'Slurred speech and irregular patterns.', color: 'var(--color-drunk)', risk: 'Elevated' }
+            Angry: { title: 'Angry', text: 'Aggressive tone and keywords detected.', color: 'var(--color-angry)', risk: 'Critical' },
+            Happy: { title: 'Happy', text: 'Positive and calm tone detected.', color: 'var(--color-happy)', risk: 'Low Risk' },
+            Sad: { title: 'Sad', text: 'Downcast pitch and sorrowful patterns.', color: 'var(--color-sad)', risk: 'Elevated' }
         };
 
         const info = emotionMap[primaryKey];
@@ -202,6 +202,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
 
     // --- Interactions ---
+    const btnMic = document.getElementById('btn-mic');
+    let isRecording = false;
+    let localStream = null;
+
+    btnMic.addEventListener('click', async () => {
+        if (!isRecording) {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                isRecording = true;
+                btnMic.classList.add('recording');
+                btnMic.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><rect x="6" y="6" width="12" height="12"></rect></svg> Stop Mic`;
+            } catch (err) {
+                alert("Microphone access denied or unavailable.");
+            }
+        } else {
+            isRecording = false;
+            btnMic.classList.remove('recording');
+            btnMic.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg> Start Mic`;
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+        }
+    });
+
     btnToggleDemo.addEventListener('click', () => {
         isEscalated = !isEscalated;
         
