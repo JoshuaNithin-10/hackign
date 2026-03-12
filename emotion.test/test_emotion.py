@@ -1,20 +1,34 @@
 from transformers import pipeline
 import librosa
 import whisper
+import sounddevice as sd
+from scipy.io.wavfile import write
+
+# -----------------------------
+# Record live audio
+# -----------------------------
+fs = 16000
+seconds = 7
+
+print("Speak now...")
+
+recording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
+sd.wait()
+
+audio_file = "live_audio.wav"
+write(audio_file, fs, recording)
+
+print("Recording finished")
 
 # -----------------------------
 # Load Whisper speech model
 # -----------------------------
 speech_model = whisper.load_model("base")
 
-audio_file = "new2.wav"
-
-# Speech to text
 speech_result = speech_model.transcribe(audio_file)
 transcript = speech_result["text"]
 
 print("Transcript:", transcript)
-
 
 # -----------------------------
 # Audio Emotion Detection
@@ -33,7 +47,6 @@ top_audio_emotion = max(audio_result, key=lambda x: x['score'])
 print("Audio Emotion:", top_audio_emotion['label'])
 print("Audio Confidence:", top_audio_emotion['score'])
 
-
 # -----------------------------
 # Text Emotion Detection
 # -----------------------------
@@ -46,7 +59,6 @@ text_result = text_emotion_model(transcript)
 
 print("Text Emotion:", text_result[0]['label'])
 print("Text Confidence:", text_result[0]['score'])
-
 
 # -----------------------------
 # Risk Detection Logic
