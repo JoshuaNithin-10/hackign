@@ -40,3 +40,6 @@ huggingface/
 # Temporary files
 *.tmp
 *.temp
+
+# Firebase key (sensitive information)
+firebase-key.json
