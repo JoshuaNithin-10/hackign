@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraCast - Speech Emotion Recognition</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-circle"></div>
+                <h2>AuraCast</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    Dashboard
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    Call Logs
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    Settings
+                </a>
+            </nav>
+            <div class="user-profile">
+                <img src="https://i.pravatar.cc/150?img=33" alt="Operator" class="avatar">
+                <div class="user-info">
+                    <span class="user-name">Op. Sarah Jenkins</span>
+                    <span class="user-role">Unit 4 - Active</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="call-info">
+                    <span class="pulse-indicator live-indicator"></span>
+                    <h1 class="call-id">Incoming Stream: #XJ-99321</h1>
+                    <span class="duration font-mono" id="call-duration">00:00</span>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-secondary" id="btn-toggle-demo">Toggle Demo Risk</button>
+                    <button class="btn btn-danger pulse-alert hidden" id="btn-escalate">ESCALATE CALL</button>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div class="left-col">
+                    <!-- Current Emotion Focus -->
+                    <div class="card glass primary-emotion-card" id="alert-card">
+                        <div class="card-header">
+                            <h3>Real-time State</h3>
+                            <span class="status-badge" id="risk-badge">Normal</span>
+                        </div>
+                        <div class="emotion-display">
+                            <h2 class="emotion-title" id="primary-emotion">Neutral</h2>
+                            <p class="emotion-desc" id="emotion-desc">Caller is maintaining a steady vocal baseline.</p>
+                        </div>
+                        <div class="confidence-big">
+                            <span class="conf-value font-mono" id="primary-confidence">95%</span>
+                            <span class="conf-label">Confidence</span>
+                        </div>
+                    </div>
+
+                    <!-- Audio Visualizer -->
+                    <div class="card glass visualizer-card">
+                        <div class="card-header">
+                            <h3>Vocal Waveform</h3>
+                        </div>
+                        <div class="canvas-container">
+                            <canvas id="waveform-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="right-col">
+                    <!-- Detailed Confidence Scores -->
+                    <div class="card glass confidence-card">
+                        <div class="card-header">
+                            <h3>Emotion Distribution</h3>
+                        </div>
+                        <div class="confidence-list">
+                            <div class="conf-item">
+                                <div class="conf-meta">
+                                    <span class="conf-name">Stressed</span>
+                                    <span class="conf-pct font-mono" id="val-stressed">5%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill bar-stressed" id="bar-stressed" style="width: 5%;"></div></div>
+                            </div>
+                            <div class="conf-item">
+                                <div class="conf-meta">
+                                    <span class="conf-name">In Pain</span>
+                                    <span class="conf-pct font-mono" id="val-pain">0%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill bar-pain" id="bar-pain" style="width: 0%;"></div></div>
+                            </div>
+                            <div class="conf-item">
+                                <div class="conf-meta">
+                                    <span class="conf-name">Abusive</span>
+                                    <span class="conf-pct font-mono" id="val-abusive">0%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill bar-abusive" id="bar-abusive" style="width: 0%;"></div></div>
+                            </div>
+                            <div class="conf-item">
+                                <div class="conf-meta">
+                                    <span class="conf-name">Drunk / Intoxicated</span>
+                                    <span class="conf-pct font-mono" id="val-drunk">0%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill bar-drunk" id="bar-drunk" style="width: 0%;"></div></div>
+                            </div>
+                            <div class="conf-item">
+                                <div class="conf-meta">
+                                    <span class="conf-name">Neutral</span>
+                                    <span class="conf-pct font-mono" id="val-neutral">95%</span>
+                                </div>
+                                <div class="progress-bar"><div class="progress-fill bar-neutral" id="bar-neutral" style="width: 95%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Chart -->
+                    <div class="card glass timeline-card">
+                        <div class="card-header">
+                            <h3>Emotion Timeline</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="timeline-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert-banner hidden" id="global-alert">
+                <strong>HIGH RISK DETECTED:</strong> Immediate attention recommended. Escalation protocol suggested.
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
