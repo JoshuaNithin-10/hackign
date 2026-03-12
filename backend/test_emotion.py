@@ -3,6 +3,7 @@ import librosa
 import whisper
 import sounddevice as sd
 from scipy.io.wavfile import write
+from firebase_db import save_call
 
 # -----------------------------
 # Record live audio
@@ -78,3 +79,5 @@ else:
     priority = "LOW"
 
 print("Priority Level:", priority)
+
+save_call(transcript, audio_emotion, text_emotion, priority)
