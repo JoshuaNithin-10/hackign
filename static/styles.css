@@ -398,6 +398,12 @@ body {
 .bar-drunk { background: var(--color-drunk); box-shadow: 0 0 8px var(--color-drunk); }
 .bar-neutral { background: var(--color-neutral); }
 
+/* new emotion bars */
+.bar-happy { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.bar-sad { background: var(--color-pain); box-shadow: 0 0 8px var(--color-pain); }
+.bar-angry { background: var(--color-abusive); box-shadow: 0 0 8px var(--color-abusive); }
+.bar-stress { background: var(--color-stressed); box-shadow: 0 0 8px var(--color-stressed); }
+
 /* Timeline Card */
 .timeline-card {
   flex: 1;

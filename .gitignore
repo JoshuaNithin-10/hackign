@@ -54,3 +54,6 @@ Thumbs.db
 
 # Node modules (if you add frontend tools later)
 node_modules/
+# FFmpeg binaries
+ffmpeg-8.0.1-essentials_build
+ffmpeg-8.0.1-essentials_build/*
