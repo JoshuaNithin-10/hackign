@@ -77,13 +77,32 @@
                         </div>
                     </div>
 
-                    <!-- Audio Visualizer -->
-                    <div class="card glass visualizer-card">
+                    <!-- Modality Confidence Breakdown -->
+                    <div class="card glass modality-card">
                         <div class="card-header">
-                            <h3>Vocal Waveform</h3>
+                            <h3>Analysis Modality</h3>
                         </div>
-                        <div class="canvas-container">
-                            <canvas id="waveform-canvas"></canvas>
+                        <div class="modality-metrics">
+                            <div class="metric-item">
+                                <div class="metric-header">
+                                    <span class="metric-label">Voice Tone & Pitch</span>
+                                    <span class="metric-value font-mono" id="voice-conf">92%</span>
+                                </div>
+                                <div class="progress-bar-sm"><div class="progress-fill bar-neutral" id="bar-voice" style="width: 92%;"></div></div>
+                            </div>
+                            
+                            <div class="metric-item">
+                                <div class="metric-header">
+                                    <span class="metric-label">Speech to Text (Keywords)</span>
+                                    <span class="metric-value font-mono" id="text-conf">88%</span>
+                                </div>
+                                <div class="progress-bar-sm"><div class="progress-fill bar-neutral" id="bar-text" style="width: 88%;"></div></div>
+                            </div>
+
+                            <div class="overall-score-container">
+                                <div class="overall-label">Overall Confidence</div>
+                                <div class="overall-score font-mono" id="overall-conf">90%</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -105,24 +124,24 @@
                             </div>
                             <div class="conf-item">
                                 <div class="conf-meta">
-                                    <span class="conf-name">In Pain</span>
-                                    <span class="conf-pct font-mono" id="val-pain">0%</span>
+                                    <span class="conf-name">Happy</span>
+                                    <span class="conf-pct font-mono" id="val-Happy">0%</span>
                                 </div>
-                                <div class="progress-bar"><div class="progress-fill bar-pain" id="bar-pain" style="width: 0%;"></div></div>
+                                <div class="progress-bar"><div class="progress-fill bar-Happy" id="bar-Happy" style="width: 0%;"></div></div>
                             </div>
                             <div class="conf-item">
                                 <div class="conf-meta">
-                                    <span class="conf-name">Abusive</span>
-                                    <span class="conf-pct font-mono" id="val-abusive">0%</span>
+                                    <span class="conf-name">Sad</span>
+                                    <span class="conf-pct font-mono" id="val-Sad">0%</span>
                                 </div>
-                                <div class="progress-bar"><div class="progress-fill bar-abusive" id="bar-abusive" style="width: 0%;"></div></div>
+                                <div class="progress-bar"><div class="progress-fill bar-Sad" id="bar-Sad" style="width: 0%;"></div></div>
                             </div>
                             <div class="conf-item">
                                 <div class="conf-meta">
-                                    <span class="conf-name">Drunk / Intoxicated</span>
-                                    <span class="conf-pct font-mono" id="val-drunk">0%</span>
+                                    <span class="conf-name">Angry</span>
+                                    <span class="conf-pct font-mono" id="val-Angry">0%</span>
                                 </div>
-                                <div class="progress-bar"><div class="progress-fill bar-drunk" id="bar-drunk" style="width: 0%;"></div></div>
+                                <div class="progress-bar"><div class="progress-fill bar-Angry" id="bar-Angry" style="width: 0%;"></div></div>
                             </div>
                             <div class="conf-item">
                                 <div class="conf-meta">

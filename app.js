@@ -79,51 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const timelineChart = new Chart(ctx, chartConfig);
 
-    // --- Audio Waveform Visualizer ---
-    const canvas = document.getElementById('waveform-canvas');
-    const waveCtx = canvas.getContext('2d');
-    
-    function resizeCanvas() {
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    let phase = 0;
-    function drawWaveform() {
-        waveCtx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Base amplitude depends on state
-        let baseAmp = isEscalated ? (canvas.height / 3) : (canvas.height / 8);
-        
-        // Draw 3 layers of waves for depth
-        for (let i = 0; i < 3; i++) {
-            waveCtx.beginPath();
-            waveCtx.lineWidth = 2;
-            waveCtx.strokeStyle = isEscalated 
-                ? `rgba(239, 68, 68, ${0.4 + i*0.2})` 
-                : `rgba(16, 185, 129, ${0.4 + i*0.2})`;
-
-            for (let x = 0; x < canvas.width; x += 2) {
-                // Modulate amplitude slightly by position and frame
-                let amplitude = baseAmp + Math.sin(x * 0.05 + phase * 2) * (baseAmp / 2);
-                
-                // Add jitter
-                let jitter = (Math.random() - 0.5) * (isEscalated ? 10 : 2);
-                
-                let y = canvas.height / 2 + Math.sin(x * 0.01 + phase + i) * amplitude + jitter;
-                
-                if (x === 0) waveCtx.moveTo(x, y);
-                else waveCtx.lineTo(x, y);
-            }
-            waveCtx.stroke();
-        }
-        
-        phase += isEscalated ? 0.2 : 0.05;
-        requestAnimationFrame(drawWaveform);
-    }
-    drawWaveform();
+    // --- Modality Confidence UI Elements ---
+    const voiceConfEl = document.getElementById('voice-conf');
+    const textConfEl = document.getElementById('text-conf');
+    const barVoiceEl = document.getElementById('bar-voice');
+    const barTextEl = document.getElementById('bar-text');
+    const overallConfEl = document.getElementById('overall-conf');
 
     // --- Mock Data Generator ---
     function formatTime(sec) {
@@ -198,6 +159,35 @@ document.addEventListener('DOMContentLoaded', () => {
         riskBadgeEl.style.color = info.color;
         riskBadgeEl.style.borderColor = info.color;
         riskBadgeEl.style.background = `rgba(0,0,0,0.3)`; // simple translucent
+
+        // Update Modality Metrics (Voice, Text, Overall)
+        let voiceConf = Math.random() * 20 + 75; // 75-95 baseline
+        let textConf = Math.random() * 20 + 70;  // 70-90 baseline
+        
+        if (isEscalated) {
+            voiceConf = Math.random() * 15 + 85; // High confidence in risk
+            textConf = Math.random() * 10 + 90;
+        }
+        
+        let overallConf = (voiceConf * 0.4) + (textConf * 0.6); // Slightly bias towards text/keywords
+        
+        // Ensure bounded 0-100
+        voiceConf = Math.max(0, Math.min(100, voiceConf));
+        textConf = Math.max(0, Math.min(100, textConf));
+        overallConf = Math.max(0, Math.min(100, overallConf));
+
+        voiceConfEl.textContent = `${Math.round(voiceConf)}%`;
+        barVoiceEl.style.width = `${Math.round(voiceConf)}%`;
+        barVoiceEl.style.background = info.color;
+        barVoiceEl.style.boxShadow = `0 0 8px ${info.color}`;
+
+        textConfEl.textContent = `${Math.round(textConf)}%`;
+        barTextEl.style.width = `${Math.round(textConf)}%`;
+        barTextEl.style.background = info.color;
+        barTextEl.style.boxShadow = `0 0 8px ${info.color}`;
+
+        overallConfEl.textContent = `${Math.round(overallConf)}%`;
+        overallConfEl.style.color = info.color;
 
         // Update Chart
         const riskScore = isEscalated ? (Math.random() * 30 + 70) : (Math.random() * 15);
